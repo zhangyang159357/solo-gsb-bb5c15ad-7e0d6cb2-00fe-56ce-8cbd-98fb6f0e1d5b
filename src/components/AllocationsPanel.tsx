@@ -3,6 +3,7 @@ import { Allocation, Plan } from '../lib/model';
 import { broadcastOf, contains, longToIpv4, parseCidr, usableHosts } from '../lib/ip';
 import DhcpPoolModal from './DhcpPoolModal';
 import ReverseDnsModal from './ReverseDnsModal';
+import StaticHostsModal from './StaticHostsModal';
 
 interface Props {
   plan: Plan;
@@ -13,6 +14,7 @@ interface Props {
 export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
   const [dhcpTarget, setDhcpTarget] = useState<Allocation | null>(null);
   const [rdnsTarget, setRdnsTarget] = useState<Allocation | null>(null);
+  const [hostsTarget, setHostsTarget] = useState<Allocation | null>(null);
   const rootOf = (alloc: Allocation) => {
     const ac = parseCidr(alloc.cidr);
     if (!ac) return '—';
@@ -77,6 +79,9 @@ export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
                             <button className="btn small" onClick={() => setRdnsTarget(a)}>
                               反向 DNS
                             </button>
+                            <button className="btn small" onClick={() => setHostsTarget(a)}>
+                              静态主机
+                            </button>
                           </>
                         )}
                         <button className="btn small" onClick={() => onResize(a)}>
@@ -104,6 +109,9 @@ export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
       )}
       {rdnsTarget && (
         <ReverseDnsModal alloc={rdnsTarget} onClose={() => setRdnsTarget(null)} />
+      )}
+      {hostsTarget && (
+        <StaticHostsModal alloc={hostsTarget} onClose={() => setHostsTarget(null)} />
       )}
     </section>
   );
