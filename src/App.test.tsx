@@ -3,7 +3,8 @@ import { renderToString } from 'react-dom/server';
 import { createElement } from 'react';
 import App from './App';
 import BatchApplyModal from './components/BatchApplyModal';
-import { Plan } from './lib/model';
+import HostPlannerModal from './components/HostPlannerModal';
+import { Allocation, Plan } from './lib/model';
 
 describe('App 冒烟测试', () => {
   it('组件树可整体渲染', () => {
@@ -39,5 +40,28 @@ describe('BatchApplyModal 冒烟测试', () => {
     expect(html).toContain('尚未填写有效行');
     // 初始无有效行：提交按钮禁用
     expect(html).toMatch(/disabled[^>]*>\s*提交批量申请/);
+  });
+});
+
+describe('HostPlannerModal 冒烟测试', () => {
+  const alloc: Allocation = {
+    id: 'a1',
+    name: '办公有线',
+    kind: 'subnet',
+    prefix: 24,
+    cidr: '192.168.0.0/24',
+  };
+
+  it('弹窗渲染编排说明、输入区，初始无有效行不显示导出区', () => {
+    const html = renderToString(
+      createElement(HostPlannerModal, { alloc, onClose: () => undefined }),
+    );
+    expect(html).toContain('静态主机地址编排');
+    expect(html).toContain('主机名 IPv4地址|auto');
+    expect(html).toContain('192.168.0.1');
+    expect(html).toContain('192.168.0.254');
+    // 初始无有效行：无结果表格与导出按钮
+    expect(html).not.toContain('hosts 文本');
+    expect(html).not.toContain('下载 hosts 文件');
   });
 });
